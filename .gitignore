@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+*.kdhx
+*.exe
+*.zip
