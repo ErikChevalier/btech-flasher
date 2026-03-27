@@ -17,6 +17,6 @@ jobs:
         env:
           CODEBERG_TOKEN: ${{ secrets.CODEBERG_TOKEN }}
         run: |
-          git remote add codeberg "https://flintwave:${CODEBERG_TOKEN}@codeberg.org/flintwaveradio/btech-flasher.git"
+          git remote add codeberg "https://flintwave:${CODEBERG_TOKEN}@codeberg.org/flintwaveradio/flintwave-kdh-flasher.git"
           git push codeberg --all --force
           git push codeberg --tags --force

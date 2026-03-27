@@ -1,5 +1,5 @@
 """
-Auto-updater for btech-flasher.
+Auto-updater for flintwave-kdh-flasher.
 Checks GitHub for newer commits and pulls them if available.
 """
 
@@ -7,7 +7,7 @@ import os
 import subprocess
 
 REPO_DIR = os.path.dirname(os.path.abspath(__file__))
-REPO_URL = "https://github.com/FlintWave/btech-flasher"
+REPO_URL = "https://github.com/FlintWave/flintwave-kdh-flasher"
 
 
 def get_local_commit():

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Test suite for btech-flasher.
+Test suite for flintwave-kdh-flasher.
 
 Run all tests:
     python3 tests.py

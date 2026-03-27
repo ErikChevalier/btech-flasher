@@ -468,10 +468,10 @@ class FlasherFrame(wx.Frame):
         if os.path.exists(guide_path):
             wx.LaunchDefaultBrowser("file://" + guide_path)
         else:
-            wx.LaunchDefaultBrowser("https://github.com/FlintWave/btech-flasher/blob/master/USAGE.md")
+            wx.LaunchDefaultBrowser("https://github.com/FlintWave/flintwave-kdh-flasher/blob/master/USAGE.md")
 
     def on_github(self, event):
-        wx.LaunchDefaultBrowser("https://github.com/FlintWave/btech-flasher")
+        wx.LaunchDefaultBrowser("https://github.com/FlintWave/flintwave-kdh-flasher")
 
     def _apply_gtk_css(self, palette):
         """Apply theme colors to GTK native widgets via CSS."""
@@ -606,7 +606,7 @@ class FlasherFrame(wx.Frame):
             "and other KDH bootloader radios from any OS."
         )
         info.SetCopyright("(c) 2026 FlintWave Radio Tools")
-        info.SetWebSite("https://github.com/FlintWave/btech-flasher")
+        info.SetWebSite("https://github.com/FlintWave/flintwave-kdh-flasher")
         info.SetLicence(mit_license)
         wx.adv.AboutBox(info)
 

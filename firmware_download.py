@@ -26,9 +26,9 @@ ALLOWED_DOMAINS = {
 }
 
 RADIOS_FILE = os.path.join(os.path.dirname(__file__), "radios.json")
-DOWNLOAD_DIR = os.path.join(os.path.expanduser("~"), ".btech-flasher", "firmware")
+DOWNLOAD_DIR = os.path.join(os.path.expanduser("~"), ".flintwave-kdh-flasher", "firmware")
 
-USER_AGENT = "btech-flasher/1.0 (https://github.com/FlintWave/btech-flasher)"
+USER_AGENT = "flintwave-kdh-flasher/1.0 (https://github.com/FlintWave/flintwave-kdh-flasher)"
 
 
 def load_radios():
