@@ -182,7 +182,7 @@ class PortFinderDialog(wx.Dialog):
 
 class FlasherFrame(wx.Frame):
     def __init__(self):
-        super().__init__(None, title="\U0001f4fb KDH Bootloader Firmware Flasher", size=(560, 500))
+        super().__init__(None, title="KDH Bootloader Firmware Flasher", size=(560, 500))
         self.SetMinSize((560, 500))
 
         self.font_size = 9
