@@ -3,3 +3,5 @@ __pycache__/
 *.kdhx
 *.exe
 *.zip
+test_screenshots/
+test_gui_visual.py
