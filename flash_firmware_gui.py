@@ -172,7 +172,52 @@ class FlasherFrame(wx.Frame):
         super().__init__(None, title="KDH Bootloader Firmware Flasher", size=(560, 500))
         self.SetMinSize((560, 500))
 
+        self.font_size = 9
+        self.high_contrast = False
+
+        # Menu bar
+        menubar = wx.MenuBar()
+        view_menu = wx.Menu()
+
+        font_menu = wx.Menu()
+        self.font_small = font_menu.AppendRadioItem(wx.ID_ANY, "Small (8pt)")
+        self.font_medium = font_menu.AppendRadioItem(wx.ID_ANY, "Medium (9pt)")
+        self.font_large = font_menu.AppendRadioItem(wx.ID_ANY, "Large (11pt)")
+        self.font_xlarge = font_menu.AppendRadioItem(wx.ID_ANY, "Extra Large (14pt)")
+        self.font_medium.Check(True)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_font_size(8), self.font_small)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_font_size(9), self.font_medium)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_font_size(11), self.font_large)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_font_size(14), self.font_xlarge)
+        view_menu.AppendSubMenu(font_menu, "Log Font Size")
+
+        theme_menu = wx.Menu()
+        self.theme_system = theme_menu.AppendRadioItem(wx.ID_ANY, "System Default")
+        self.theme_latte = theme_menu.AppendRadioItem(wx.ID_ANY, "Latte (Light)")
+        self.theme_frappe = theme_menu.AppendRadioItem(wx.ID_ANY, "Frapp\u00e9")
+        self.theme_macchiato = theme_menu.AppendRadioItem(wx.ID_ANY, "Macchiato")
+        self.theme_mocha = theme_menu.AppendRadioItem(wx.ID_ANY, "Mocha (Dark)")
+        self.theme_hc = theme_menu.AppendRadioItem(wx.ID_ANY, "High Contrast")
+        self.theme_system.Check(True)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("system"), self.theme_system)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("latte"), self.theme_latte)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("frappe"), self.theme_frappe)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("macchiato"), self.theme_macchiato)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("mocha"), self.theme_mocha)
+        self.Bind(wx.EVT_MENU, lambda e: self._set_theme("high_contrast"), self.theme_hc)
+        view_menu.AppendSubMenu(theme_menu, "Theme")
+
+        menubar.Append(view_menu, "View")
+
+        help_menu = wx.Menu()
+        about_item = help_menu.Append(wx.ID_ABOUT, "About")
+        self.Bind(wx.EVT_MENU, self.on_about, about_item)
+        menubar.Append(help_menu, "Help")
+
+        self.SetMenuBar(menubar)
+
         panel = wx.Panel(self)
+        self.panel = panel
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         # Radio model selector
@@ -281,6 +326,72 @@ class FlasherFrame(wx.Frame):
             self.log.AppendText(f"Auto-detected: {label}\n")
         elif port_devices:
             self.port_combo.SetSelection(0)
+
+    def _set_font_size(self, size):
+        self.font_size = size
+        font = wx.Font(size, wx.FONTFAMILY_TELETYPE, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        self.log.SetFont(font)
+        self.log.Refresh()
+
+    def _set_theme(self, theme):
+        panel = self.panel
+
+        # Catppuccin palettes: (base, mantle, text, subtext0, green, link)
+        themes = {
+            "latte": ((239, 241, 245), (230, 233, 239), (76, 79, 105),
+                      (108, 111, 133), (64, 160, 43), (30, 102, 245)),
+            "frappe": ((48, 52, 70), (41, 44, 60), (198, 208, 245),
+                       (165, 173, 206), (166, 209, 137), (140, 170, 238)),
+            "macchiato": ((36, 39, 58), (30, 32, 48), (202, 211, 245),
+                          (165, 173, 203), (166, 218, 149), (138, 173, 244)),
+            "mocha": ((30, 30, 46), (24, 24, 37), (205, 214, 244),
+                      (166, 173, 200), (166, 227, 161), (137, 180, 250)),
+            "high_contrast": ((0, 0, 0), (0, 0, 0), (255, 255, 0),
+                              (255, 255, 0), (0, 255, 0), (0, 255, 255)),
+        }
+
+        if theme not in themes:
+            panel.SetBackgroundColour(wx.NullColour)
+            panel.SetForegroundColour(wx.NullColour)
+            self.log.SetBackgroundColour(wx.NullColour)
+            self.log.SetForegroundColour(wx.NullColour)
+            self.radio_info.SetForegroundColour(wx.Colour(80, 80, 80))
+            panel.Refresh()
+            self.log.Refresh()
+            return
+
+        base, mantle, text, subtext, green, link = [wx.Colour(*c) for c in themes[theme]]
+
+        panel.SetBackgroundColour(base)
+        panel.SetForegroundColour(text)
+        self.log.SetBackgroundColour(mantle)
+        self.log.SetForegroundColour(green)
+        self.radio_info.SetForegroundColour(subtext)
+
+        for child in panel.GetChildren():
+            if isinstance(child, wx.adv.HyperlinkCtrl):
+                child.SetNormalColour(link)
+                child.SetVisitedColour(link)
+                child.SetHoverColour(green)
+            elif not isinstance(child, wx.TextCtrl):
+                child.SetForegroundColour(text)
+
+        panel.Refresh()
+        self.log.Refresh()
+
+    def on_about(self, event):
+        VERSION = "26.03.1"
+        info = wx.adv.AboutDialogInfo()
+        info.SetName("KDH Bootloader Firmware Flasher")
+        info.SetVersion(VERSION)
+        info.SetDescription(
+            "Flash .kdhx firmware to BTECH, Baofeng, Radtel,\n"
+            "and other KDH bootloader radios from any OS."
+        )
+        info.SetCopyright("(c) 2026 FlintWave Radio Tools")
+        info.SetWebSite("https://github.com/FlintWave/btech-flasher")
+        info.SetLicence("MIT License")
+        wx.adv.AboutBox(info)
 
     def _check_update(self):
         try:
