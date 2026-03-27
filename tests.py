@@ -422,6 +422,80 @@ class TestVersionConsistency(unittest.TestCase):
                 self.assertTrue(p.isdigit())
 
 
+class TestReportURLs(unittest.TestCase):
+    """Verify test report URL generation is safe."""
+
+    def test_github_issue_url_is_valid(self):
+        import urllib.parse
+        title = "Test Report: BTECH BF-F8HP Pro — SUCCESS"
+        body = "Radio: BTECH BF-F8HP Pro\nFirmware: test.kdhx\nResult: SUCCESS\n"
+        url = ("https://github.com/FlintWave/flintwave-kdh-flasher/issues/new?"
+               + urllib.parse.urlencode({"title": title, "body": body, "labels": "test-report"}))
+        self.assertTrue(url.startswith("https://github.com/FlintWave/flintwave-kdh-flasher/"))
+        parsed = urllib.parse.urlparse(url)
+        self.assertEqual(parsed.scheme, "https")
+        self.assertEqual(parsed.hostname, "github.com")
+
+    def test_github_url_includes_label(self):
+        import urllib.parse
+        title = "Test Report: BTECH BF-F8HP Pro — SUCCESS"
+        body = "Radio: BTECH BF-F8HP Pro\nResult: SUCCESS\n"
+        url = ("https://github.com/FlintWave/flintwave-kdh-flasher/issues/new?"
+               + urllib.parse.urlencode({"title": title, "body": body, "labels": "test-report"}))
+        self.assertIn("labels=test-report", url)
+
+    def test_special_characters_escaped(self):
+        import urllib.parse
+        title = 'Test Report: Radio "Special" & <weird>'
+        body = "Line1\nLine2\n"
+        params = urllib.parse.urlencode({"title": title, "body": body})
+        self.assertNotIn("<", params)
+        self.assertNotIn(">", params)
+        self.assertNotIn('"', params)
+
+
+class TestReportGeneration(unittest.TestCase):
+    """Test that report body content is well-formed."""
+
+    def test_success_report_body(self):
+        import platform
+        radio_name = "BTECH BF-F8HP Pro"
+        fw_file = "BTECH_V0.53_260116.kdhx"
+        report = (
+            f"Radio: {radio_name}\n"
+            f"Firmware: {fw_file}\n"
+            f"Result: SUCCESS\n"
+            f"OS: {platform.system()} {platform.release()}\n"
+            f"Python: {platform.python_version()}\n"
+        )
+        self.assertIn("Radio: BTECH BF-F8HP Pro", report)
+        self.assertIn("Result: SUCCESS", report)
+        self.assertNotIn("Error:", report)
+
+    def test_failure_report_body(self):
+        import platform
+        error_msg = "No response from radio"
+        report = (
+            f"Radio: RT-470\n"
+            f"Firmware: test.kdhx\n"
+            f"Result: FAILED\n"
+            f"OS: {platform.system()} {platform.release()}\n"
+            f"Python: {platform.python_version()}\n"
+            f"Error: {error_msg}\n"
+        )
+        self.assertIn("Result: FAILED", report)
+        self.assertIn("Error: No response from radio", report)
+
+    def test_report_body_has_os_info(self):
+        import platform
+        report = f"OS: {platform.system()} {platform.release()}\n"
+        self.assertIn(platform.system(), report)
+
+    def test_additional_notes_placeholder(self):
+        report_body = "Radio: Test\nResult: SUCCESS\n\nAdditional notes:\n"
+        self.assertTrue(report_body.endswith("Additional notes:\n"))
+
+
 class TestThemePalettes(unittest.TestCase):
     """Verify theme palette data is well-formed."""
 

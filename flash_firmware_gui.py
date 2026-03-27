@@ -599,10 +599,16 @@ class FlasherFrame(wx.Frame):
         about_sizer.Add(copy_text, 0, wx.ALIGN_CENTER)
         about_sizer.AddSpacer(5)
 
-        link = wx.adv.HyperlinkCtrl(about_panel,
-            label="github.com/FlintWave/flintwave-kdh-flasher",
+        gh_link = wx.adv.HyperlinkCtrl(about_panel,
+            label="GitHub: FlintWave/flintwave-kdh-flasher",
             url="https://github.com/FlintWave/flintwave-kdh-flasher")
-        about_sizer.Add(link, 0, wx.ALIGN_CENTER)
+        about_sizer.Add(gh_link, 0, wx.ALIGN_CENTER)
+        about_sizer.AddSpacer(2)
+
+        cb_link = wx.adv.HyperlinkCtrl(about_panel,
+            label="Codeberg: flintwaveradio/flintwave-kdh-flasher",
+            url="https://codeberg.org/flintwaveradio/flintwave-kdh-flasher")
+        about_sizer.Add(cb_link, 0, wx.ALIGN_CENTER)
 
         about_panel.SetSizer(about_sizer)
         notebook.AddPage(about_panel, "About")
@@ -870,6 +876,9 @@ class FlasherFrame(wx.Frame):
         threading.Thread(target=self._flash_thread, args=(port, firmware_path), daemon=True).start()
 
     def _flash_thread(self, port, firmware_path):
+        radio = self._get_selected_radio()
+        radio_name = radio["name"] if radio else "Unknown"
+
         try:
             import math
             import time
@@ -925,14 +934,98 @@ class FlasherFrame(wx.Frame):
             self.log_msg("")
             self.log_msg("Firmware update complete!")
             self.log_msg("Power cycle the radio and check Menu > Radio Info.")
-            wx.CallAfter(wx.MessageBox, "Firmware update complete!", "Success", wx.OK | wx.ICON_INFORMATION)
+            wx.CallAfter(self._offer_test_report, radio_name, firmware_path, True, "")
 
         except Exception as e:
-            self.log_msg(f"\nERROR: {e}")
+            error_msg = str(e)
+            self.log_msg(f"\nERROR: {error_msg}")
             self.log_msg("Radio may need to be power cycled and put back in bootloader mode.")
-            wx.CallAfter(wx.MessageBox, f"Flash failed:\n{e}", "Error", wx.OK | wx.ICON_ERROR)
+            wx.CallAfter(self._offer_test_report, radio_name, firmware_path, False, error_msg)
         finally:
             self.set_buttons(True)
+
+    def _offer_test_report(self, radio_name, firmware_path, success, error_msg):
+        import platform
+        import urllib.parse
+
+        status = "SUCCESS" if success else "FAILED"
+        fw_file = os.path.basename(firmware_path) if firmware_path else "unknown"
+
+        report_body = (
+            f"Radio: {radio_name}\n"
+            f"Firmware: {fw_file}\n"
+            f"Result: {status}\n"
+            f"OS: {platform.system()} {platform.release()}\n"
+            f"Python: {platform.python_version()}\n"
+        )
+        if error_msg:
+            report_body += f"Error: {error_msg}\n"
+        report_body += "\nAdditional notes:\n"
+
+        title = f"Test Report: {radio_name} — {status}"
+
+        dlg = wx.Dialog(self, title="Submit Test Report", size=(520, 500))
+        dlg.SetMinSize((480, 400))
+        dlg.SetMaxSize((600, 600))
+        sizer = wx.BoxSizer(wx.VERTICAL)
+
+        ui_font = wx.Font(11, wx.FONTFAMILY_DEFAULT,
+                          wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+        mono_font = wx.Font(10, wx.FONTFAMILY_TELETYPE,
+                            wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+
+        if success:
+            msg = "Flash completed successfully!\nWould you like to submit a test report?"
+        else:
+            msg = "Flash failed.\nWould you like to submit a report to help us debug?"
+
+        msg_text = wx.StaticText(dlg, label=msg)
+        msg_text.SetFont(ui_font)
+        sizer.Add(msg_text, 0, wx.LEFT | wx.TOP | wx.RIGHT, 15)
+
+        preview = wx.TextCtrl(dlg, value=report_body,
+                              style=wx.TE_MULTILINE)
+        preview.SetFont(mono_font)
+        preview.SetInsertionPointEnd()
+        sizer.Add(preview, 1, wx.EXPAND | wx.LEFT | wx.RIGHT, 15)
+
+        sizer.AddSpacer(10)
+
+        hint = wx.StaticText(dlg, label="You can also email reports to flintwave@tuta.com")
+        hint.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT,
+                              wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+        hint.SetForegroundColour(wx.Colour(120, 120, 120))
+        sizer.Add(hint, 0, wx.ALIGN_CENTER)
+
+        sizer.AddSpacer(10)
+
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        submit_btn = wx.Button(dlg, label="Submit")
+        submit_btn.SetFont(ui_font)
+        submit_btn.Bind(wx.EVT_BUTTON, lambda e: (
+            wx.LaunchDefaultBrowser(
+                "https://github.com/FlintWave/flintwave-kdh-flasher/issues/new?"
+                + urllib.parse.urlencode({
+                    "title": title,
+                    "body": preview.GetValue(),
+                    "labels": "test-report"
+                })
+            ),
+            dlg.EndModal(wx.ID_OK)
+        ))
+        btn_sizer.Add(submit_btn, 0, wx.RIGHT, 8)
+
+        skip_btn = wx.Button(dlg, wx.ID_CANCEL, label="Skip")
+        skip_btn.SetFont(ui_font)
+        btn_sizer.Add(skip_btn, 0)
+
+        sizer.Add(btn_sizer, 0, wx.ALIGN_CENTER | wx.BOTTOM, 15)
+
+        dlg.SetSizer(sizer)
+        dlg.Centre()
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def on_dry_run(self, event):
         firmware_path = self.file_path.GetValue()
