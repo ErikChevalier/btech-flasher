@@ -1,6 +1,6 @@
 # FlintWave KDH Flasher
 
-A cross-platform tool for flashing `.kdhx` firmware to radios that use the KDH bootloader — BTECH, Baofeng, Radtel, and others. No Wine or Windows VM needed.
+A cross-platform tool for flashing `.kdhx` firmware to radios that use the KDH bootloader — BTECH, Baofeng, Radtel, and others. Works on Linux, macOS, and Windows.
 
 Maintained by [FlintWave Radio Tools](https://github.com/FlintWave). Contact: flintwave@tuta.com
 
