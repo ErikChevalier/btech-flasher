@@ -9,7 +9,6 @@ import os
 import re
 import fnmatch
 import shutil
-import subprocess
 import zipfile
 import tempfile
 from pathlib import Path
@@ -140,37 +139,35 @@ def _extract_kdhx_from_zip(zip_path, pattern="*.kdhx"):
 
 
 def _extract_kdhx_from_rar(rar_path, pattern="*.kdhx"):
-    """Extract .kdhx files from a RAR archive using unrar or 7z."""
-    extract_dir = os.path.dirname(rar_path)
+    """Extract .kdhx files from a RAR archive.
 
-    # Try unrar first, then 7z
-    for tool, args in [
-        ("unrar", ["unrar", "e", "-o+", rar_path, extract_dir + "/"]),
-        ("7z", ["7z", "e", f"-o{extract_dir}", "-y", rar_path]),
-    ]:
-        try:
-            result = subprocess.run(
-                args, capture_output=True, timeout=30,
-            )
-            if result.returncode == 0:
-                break
-        except FileNotFoundError:
-            continue
-    else:
+    Uses the rarfile library (pip install rarfile / apt install python3-rarfile),
+    which requires unrar to be installed on the system.
+    """
+    try:
+        import rarfile
+    except ImportError:
         raise RuntimeError(
-            "Cannot extract RAR archive. Install 'unrar' or 'p7zip':\n"
-            "  Linux:   sudo apt install unrar  (or p7zip-full)\n"
-            "  macOS:   brew install unrar  (or p7zip)\n"
-            "  Windows: install 7-Zip from https://7-zip.org"
+            "Cannot extract RAR archive. Install the rarfile Python package:\n"
+            "  Linux:   sudo apt install python3-rarfile unrar\n"
+            "  pip:     pip install rarfile  (also needs unrar)\n"
+            "  macOS:   pip install rarfile && brew install unrar\n"
+            "  Windows: pip install rarfile  (install UnRAR from https://rarlab.com)"
         )
 
-    # Find extracted .kdhx files
+    extract_dir = os.path.dirname(rar_path)
     extracted = []
-    for name in os.listdir(extract_dir):
-        if name.startswith(".") or name.startswith("__"):
-            continue
-        if fnmatch.fnmatch(name, pattern):
-            extracted.append(os.path.join(extract_dir, name))
+
+    with rarfile.RarFile(rar_path) as rf:
+        for name in rf.namelist():
+            basename = os.path.basename(name)
+            if not basename or basename.startswith(".") or basename.startswith("__"):
+                continue
+            if fnmatch.fnmatch(basename, pattern):
+                dest = os.path.join(extract_dir, basename)
+                with rf.open(name) as src, open(dest, "wb") as dst:
+                    shutil.copyfileobj(src, dst, length=65536)
+                extracted.append(dest)
 
     return extracted
 

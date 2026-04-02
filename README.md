@@ -87,8 +87,6 @@ Or download and run `install.bat` for an automated setup.
 |-------|-------------|-------------------|--------|
 | BF-F8HP Pro | BTECH | Automatic | Yes |
 | UV-25 Plus / UV-25 Pro | Baofeng | Automatic | No |
-| UV-5RM / UV-5RM Plus | Baofeng | Manual (browse) | No |
-| UV-5RH | Baofeng | Manual (browse) | No |
 | RT-470 | Radtel | Automatic (live) | No |
 | RT-490 | Radtel | Automatic (live) | No |
 | Other KDH Radio | Generic | Manual (browse) | — |

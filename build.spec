@@ -27,6 +27,7 @@ a = Analysis(
         'firmware_download',
         'firmware_manifest',
         'firmware_version',
+        'rarfile',
         'updater',
         'gui_main',
         'gui_dialogs',

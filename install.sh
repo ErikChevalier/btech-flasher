@@ -36,8 +36,20 @@ echo "Found Python $PY_VER"
 
 # Install Python dependencies
 echo "Installing dependencies..."
-$PYTHON -m pip install --user --quiet pyserial requests 2>/dev/null || \
-    $PYTHON -m pip install --quiet pyserial requests
+$PYTHON -m pip install --user --quiet pyserial requests rarfile 2>/dev/null || \
+    $PYTHON -m pip install --quiet pyserial requests rarfile
+
+# unrar — needed by rarfile for RAR firmware archives
+if ! command -v unrar &>/dev/null; then
+    echo "Installing unrar (needed for Radtel firmware)..."
+    if command -v apt &>/dev/null; then
+        sudo apt install -y unrar 2>/dev/null || true
+    elif command -v dnf &>/dev/null; then
+        sudo dnf install -y unrar 2>/dev/null || true
+    elif command -v brew &>/dev/null; then
+        brew install unrar 2>/dev/null || true
+    fi
+fi
 
 # wxPython — try pip first, fall back to system package
 if ! $PYTHON -c "import wx" 2>/dev/null; then
