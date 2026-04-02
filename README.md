@@ -44,7 +44,7 @@ This installs dependencies, clones the repo, adds a desktop launcher, and sets u
 #### Linux (manual)
 
 ```bash
-sudo apt install python3-wxgtk4.0 python3-serial python3-requests git
+sudo apt install python3-wxgtk4.0 python3-serial python3-requests python3-rarfile unrar git
 git clone https://github.com/FlintWave/flintwave-kdh-flasher.git
 cd flintwave-kdh-flasher
 python3 flash_firmware_gui.py
@@ -59,8 +59,8 @@ Log out and back in for the group change to take effect.
 #### macOS
 
 ```bash
-brew install python wxpython
-pip3 install pyserial requests
+brew install python wxpython unrar
+pip3 install pyserial requests rarfile
 git clone https://github.com/FlintWave/flintwave-kdh-flasher.git
 cd flintwave-kdh-flasher
 python3 flash_firmware_gui.py
@@ -71,7 +71,7 @@ python3 flash_firmware_gui.py
 1. Install [Python 3.10+](https://python.org) — **check "Add Python to PATH" during install**
 2. Open Command Prompt and run:
 ```
-py -m pip install pyserial wxPython requests
+py -m pip install pyserial wxPython requests rarfile
 ```
 3. Download and extract the [ZIP](https://github.com/FlintWave/flintwave-kdh-flasher/archive/refs/heads/master.zip)
 4. Run:
