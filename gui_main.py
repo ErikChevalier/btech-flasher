@@ -253,6 +253,8 @@ class FlasherFrame(wx.Frame):
             pass
 
     def _check_update(self):
+        import time
+        time.sleep(2)  # Let the UI finish rendering before showing dialogs
         try:
             has_update, local_info, remote_info = updater.check_for_update()
             if has_update:
@@ -286,7 +288,10 @@ class FlasherFrame(wx.Frame):
                 "Open the downloads page?",
                 "Update Available", wx.YES_NO | wx.ICON_INFORMATION)
             if dlg.ShowModal() == wx.ID_YES:
-                wx.LaunchDefaultBrowser(updater.get_releases_url())
+                url = updater.get_releases_url()
+                if not wx.LaunchDefaultBrowser(url):
+                    import webbrowser
+                    webbrowser.open(url)
             dlg.Destroy()
 
     def _restart(self):
