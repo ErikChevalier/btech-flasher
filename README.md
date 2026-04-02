@@ -15,21 +15,21 @@ Maintained by [FlintWave Radio Tools](https://github.com/FlintWave). Contact: fl
 
 ### Installers (recommended)
 
-Download from [GitHub Releases](../../releases/latest):
+Download from [GitHub Releases](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest):
 
-| OS | Installer | What it does |
-|----|-----------|-------------|
-| Linux (Debian/Ubuntu/Pop!_OS/Mint) | `.deb` | `sudo dpkg -i *.deb` — adds to app launcher |
-| Linux (Fedora/RHEL/openSUSE) | `.rpm` | `sudo rpm -i *.rpm` — adds to app launcher |
-| Windows | `FlintWave-KDH-Flasher-Setup.exe` | Installer with Start Menu + desktop shortcut |
-| macOS | `.dmg` | Drag to Applications |
+| OS | Download | Install |
+|----|----------|---------|
+| Linux (Debian/Ubuntu/Pop!_OS/Mint) | [flintwave-kdh-flasher_amd64.deb](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/flintwave-kdh-flasher_26.03.9_amd64.deb) | `sudo dpkg -i *.deb` |
+| Linux (Fedora/RHEL/openSUSE) | [flintwave-kdh-flasher.x86_64.rpm](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/flintwave-kdh-flasher-v26.03.9-1.x86_64.rpm) | `sudo rpm -i *.rpm` |
+| Windows | [FlintWave-KDH-Flasher-Setup.exe](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/FlintWave-KDH-Flasher-Setup.exe) | Run the installer |
+| macOS | [FlintWave-KDH-Flasher.dmg](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/FlintWave-KDH-Flasher.dmg) | Drag to Applications |
 
 ### Portable (no install)
 
-| OS | File | How to run |
-|----|------|-----------|
-| Linux | `.AppImage` | `chmod +x` and double-click |
-| Windows | `FlintWave-KDH-Flasher.exe` | Double-click to run |
+| OS | Download | How to run |
+|----|----------|-----------|
+| Linux | [FlintWave-KDH-Flasher.AppImage](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/FlintWave-KDH-Flasher-x86_64.AppImage) | `chmod +x` and double-click |
+| Windows | [FlintWave-KDH-Flasher.exe](https://github.com/FlintWave/flintwave-kdh-flasher/releases/latest/download/FlintWave-KDH-Flasher.exe) | Double-click to run |
 
 ### Install from source
 
